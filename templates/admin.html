@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - News Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Admin Panel</h1>
+        
+        <!-- Admin Dashboard -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Users</h5>
+                        <p class="card-text display-4">{{ users|length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Posts</h5>
+                        <p class="card-text display-4">{{ posts|length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Categories</h5>
+                        <p class="card-text display-4">8</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" id="adminTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">Users</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-tab-pane" type="button" role="tab" aria-controls="posts-tab-pane" aria-selected="false">Posts</button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="adminTabContent">
+            <!-- Users Tab -->
+            <div class="tab-pane fade show active" id="users-tab-pane" role="tabpanel" aria-labelledby="users-tab" tabindex="0">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">User Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Admin</th>
+                                        <th>Posts</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if user.is_admin %}
+                                                <span class="badge bg-success">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ user.posts|length }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">View</button>
+                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Posts Tab -->
+            <div class="tab-pane fade" id="posts-tab-pane" role="tabpanel" aria-labelledby="posts-tab" tabindex="0">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Post Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Author</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in posts %}
+                                    <tr>
+                                        <td>{{ post.id }}</td>
+                                        <td>{{ post.title }}</td>
+                                        <td><span class="badge bg-secondary">{{ post.category }}</span></td>
+                                        <td>{{ post.author.username }}</td>
+                                        <td>{{ post.date_posted.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('news.news_detail', post_id=post.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="{{ url_for('news.update_post', post_id=post.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}">
+                                                Delete
+                                            </button>
+                                            
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade" id="deletePostModal{{ post.id }}" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="deletePostModalLabel">Delete Post</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Are you sure you want to delete the post "{{ post.title }}"? This action cannot be undone.
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <form action="{{ url_for('news.delete_post', post_id=post.id) }}" method="POST">
+                                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                <input class="btn btn-danger" type="submit" value="Delete">
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

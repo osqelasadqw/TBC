@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}News - News Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">
+            {% if category %}
+                {{ category }} News
+            {% else %}
+                All News
+            {% endif %}
+        </h1>
+        
+        {% if posts.items %}
+            {% for post in posts.items %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span class="badge bg-secondary">{{ post.category }}</span>
+                        <small class="text-muted float-end">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% if post.image_file %}
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <img src="{{ url_for('static', filename='uploads/' + post.image_file) }}" class="img-fluid rounded post-thumbnail" alt="{{ post.title }}">
+                            </div>
+                            <div class="col-md-8">
+                            {% else %}
+                            <div class="col-12">
+                            {% endif %}
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">{{ post.summary }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('news.news_detail', post_id=post.id) }}" class="btn btn-outline-primary">Read More</a>
+                                    <small class="text-muted">Posted by {{ post.author.username }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+        {% else %}
+            <div class="alert alert-info">
+                {% if category %}
+                    No news posts available in the {{ category }} category.
+                {% else %}
+                    No news posts available.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+                            <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Contribute</h5>
+            </div>
+            <div class="card-body">
+                <p>Have a story to share? Join our community and post your news.</p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('news.new_post') }}" class="btn btn-success">Create a Post</a>
+                {% else %}
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login to Post</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary">Register</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .post-thumbnail {
+        height: 150px;
+        object-fit: cover;
+        width: 100%;
+    }
+</style>
+{% endblock %} 

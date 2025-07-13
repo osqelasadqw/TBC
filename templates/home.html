@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Home - News Portal{% endblock %}
+
+{% block content %}
+<div class="jumbotron p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to News Portal</h1>
+        <p class="col-md-8 fs-4">Your trusted source for the latest news and updates from around the world.</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('news.news_list') }}">Browse News</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        {% if posts.items %}
+            {% for post in posts.items %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span class="badge bg-secondary">{{ post.category }}</span>
+                        <small class="text-muted float-end">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% if post.image_file %}
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <img src="{{ url_for('static', filename='uploads/' + post.image_file) }}" class="img-fluid rounded post-thumbnail" alt="{{ post.title }}">
+                            </div>
+                            <div class="col-md-8">
+                            {% else %}
+                            <div class="col-12">
+                            {% endif %}
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">{{ post.summary }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('news.news_detail', post_id=post.id) }}" class="btn btn-outline-primary">Read More</a>
+                                    <small class="text-muted">Posted by {{ post.author.username }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+
+        {% else %}
+            <div class="alert alert-info">No news posts available yet.</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Join Our Community</h5>
+            </div>
+            <div class="card-body">
+                <p>Register to post your own news and join our community of contributors.</p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('news.new_post') }}" class="btn btn-success">Create a Post</a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Register Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .post-thumbnail {
+        height: 150px;
+        object-fit: cover;
+        width: 100%;
+    }
+</style>
+{% endblock %} 

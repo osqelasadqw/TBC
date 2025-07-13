@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ legend }} - News Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title mb-0">{{ legend }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {% if form.title.errors %}
+                            {{ form.title(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.title(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.summary.label(class="form-label") }}
+                        {% if form.summary.errors %}
+                            {{ form.summary(class="form-control is-invalid", rows=3) }}
+                            <div class="invalid-feedback">
+                                {% for error in form.summary.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.summary(class="form-control", rows=3) }}
+                        {% endif %}
+                        <div class="form-text">A brief summary of your news post (max 200 characters).</div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control is-invalid", rows=10) }}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control", rows=10) }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.category.label(class="form-label") }}
+                        {% if form.category.errors %}
+                            {{ form.category(class="form-control is-invalid", value="News") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.category.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.category(class="form-control", value="News") }}
+                        {% endif %}
+                        <div class="form-text">Category for your news post (e.g., News, Article, etc.)</div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.image.label(class="form-label") }}
+                        {{ form.image(class="form-control") }}
+                        {% if form.image.errors %}
+                            {% for error in form.image.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-text">Upload an image for your news post (optional).</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('news.news_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
